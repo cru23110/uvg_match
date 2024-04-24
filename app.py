@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return '¡Hola, mundo! Esta es mi primera aplicación Flask.'
+    return 'prueba'
 
 if __name__ == '__main__':
     app.run(debug=True)
