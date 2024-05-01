@@ -12,76 +12,56 @@ body {
     margin: 0;
 }
 
-.menu-bar {
-    background-color: #fff;
+.header {
+    background-color: var(--card-background-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px 20px;
-}
-
-.menu-bar ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-.menu-bar ul li {
-    display: inline;
-    margin-right: 20px;
-}
-
-.menu-bar ul li a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-}
-
-.menu-bar ul li a:hover {
-    color: #ff6b6b;
-}
-
-.card-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
-}
-
-.tinder-card {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    text-align: center;
-    width: 300px;
-}
-
-.tinder-card img {
-    border-radius: 50%;
-    width: 100px;
-    height: 100px;
-    margin-bottom: 10px;
-}
-
-.like-btn, .dislike-btn {
-    background-color: #ff6b6b;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 10px;
     padding: 10px 20px;
-    border-radius: 5px;
+}
+
+.logo-container {
+    flex: 1;
+}
+
+.logo-link {
+    text-decoration: none;
+}
+
+.logo-link img {
+    width: 200px;
+}
+
+.user-icon-container {
+    display: flex;
+    align-items: center;
+}
+
+.user-icon-link {
+    text-decoration: none;
+    color: var(--text-color);
+    margin-left: 10px;
+}
+
+.user-icon-link i {
+    font-size: 30px;
+}
+
+.pro-container {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.pro-control {
+    border: none;
+    background: none;
+    cursor: pointer;
     outline: none;
 }
 
-.like-btn:hover, .dislike-btn:hover {
-    background-color: #ff5252;
-}
-
-/* Media queries for responsiveness */
-
-@media only screen and (max-width: 600px) {
-    .tinder-card {
-        width: 90%;
-    }
+.pro-control img {
+    width: 24px;
+    height: 24px;
 }
