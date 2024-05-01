@@ -1,53 +1,39 @@
-# recommendation_algorithm.py
+from db.neo4j.neo4j_config import neo4j_connection
 
-def generate_profile(user_preferences):
-    """
-    Genera un perfil de usuario basado en sus preferencias.
-    
-    Args:
-        user_preferences (dict): Diccionario con las preferencias del usuario.
-            Ejemplo: {'gustos': ['deporte', 'música'], 'disgustos': ['política']}
-    
-    Returns:
-        dict: Perfil generado con características aleatorias y las preferencias del usuario.
-    """
-    # Aquí puedes implementar la lógica para generar un perfil de usuario
-    # combinando las preferencias del usuario con otras características aleatorias.
-    # Por ejemplo, podrías seleccionar intereses aleatorios de una lista predefinida
-    # y combinarlos con los gustos y disgustos del usuario.
-    
-    # En este ejemplo simple, simplemente agregamos algunas características aleatorias
-    # junto con las preferencias del usuario para formar el perfil.
-    profile = {
-        'nombre': 'Perfil Generado',
-        'edad': 25,
-        'genero': 'masculino',
-        'intereses': ['deporte', 'música', 'viajes']
-    }
-    
-    return profile
+class ContentBasedRecommendation:
+    def __init__(self):
+        self.profiles = self.get_profiles_from_database()
+        self.preferences = self.get_preferences_from_database()
 
-def update_preferences(user_preferences, profile_feedback):
-    """
-    Actualiza las preferencias del usuario basadas en el feedback del perfil.
-    
-    Args:
-        user_preferences (dict): Diccionario con las preferencias del usuario.
-            Ejemplo: {'gustos': ['deporte', 'música'], 'disgustos': ['política']}
-        profile_feedback (str): Feedback del usuario sobre el perfil recomendado ('like' o 'dislike').
-    
-    Returns:
-        dict: Preferencias actualizadas del usuario.
-    """
-    # Actualiza las preferencias del usuario según el feedback del perfil.
-    # Por ejemplo, si el usuario indicó que le gustó el perfil, se pueden agregar
-    # las características del perfil a la lista de gustos del usuario.
-    if profile_feedback == 'like':
-        for interest in profile_feedback['intereses']:
-            if interest not in user_preferences['gustos']:
-                user_preferences['gustos'].append(interest)
-    elif profile_feedback == 'dislike':
-        # Aquí podrías implementar la lógica para manejar los disgustos del usuario
-        pass
-    
-    return user_preferences
+    def get_profiles_from_database(self):
+        with neo4j_connection.get_session() as session:
+            result = session.run("MATCH (p:Perfil) RETURN p")
+            profiles = [record["p"] for record in result]
+        return profiles
+
+    def get_preferences_from_database(self):
+        with neo4j_connection.get_session() as session:
+            result = session.run("MATCH (u:Usuario)-[:LE_GUSTA]->(g:Gusto) RETURN u, g")
+            preferences = [{"user_id": record["u"]["id_usuario"], "preference": record["g"]["nombre"]} for record in result]
+        return preferences
+
+    def generate_recommendations(self, user_id):
+        user_preferences = self.get_user_preferences(user_id)
+        recommendations = {}
+        for profile in self.profiles:
+            similarity = self.calculate_similarity(user_preferences, profile['preferences'])
+            recommendations[profile['id_perfil']] = similarity
+        sorted_recommendations = sorted(recommendations.items(), key=lambda x: x[1], reverse=True)
+        return sorted_recommendations
+
+    def get_user_preferences(self, user_id):
+        user_preferences = []
+        for preference in self.preferences:
+            if preference['user_id'] == user_id:
+                user_preferences.append(preference['preference'])
+        return user_preferences
+
+    def calculate_similarity(self, preferences1, preferences2):
+        intersection = set(preferences1) & set(preferences2)
+        similarity = len(intersection) / (len(preferences1) * len(preferences2))
+        return similarity
