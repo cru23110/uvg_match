@@ -1,4 +1,4 @@
-from db.neo4j.neo4j_config import neo4j_connection
+from ..db.neo4j.neo4j_config import neo4j_connection
 
 class ContentBasedRecommendation:
     def __init__(self):

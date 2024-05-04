@@ -12,6 +12,8 @@ body {
     margin: 0;
 }
 
+/* ----- Header ----- */
+
 .header {
     background-color: var(--card-background-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -64,4 +66,21 @@ body {
 .pro-control img {
     width: 24px;
     height: 24px;
+}
+
+/* ----- Footer ----- */
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+p {
+    margin: 0;
 }

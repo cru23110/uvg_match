@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../static/css/app.css">
 </head>
 <body>
+    <!-- ------- Header ------- -->
     <header class="header">
         <div class="logo-container">
             <a href="/" class="logo-link">
@@ -28,6 +29,7 @@
         </div>
     </header>
 
+    <!-- ------- Cards ------- -->
     <div class="card-container">
         <div class="tinder-card">
             <img src="profile1.jpg" alt="Profile Picture">
@@ -42,6 +44,14 @@
     <h1>Recomendaciones</h1>
     <ul id="recommendations"></ul>
 
+    <!-- ------- Footer ------- -->
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2024 Grupo 1. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- ------- Scripts ------- -->
     <script>
         // Realizar una solicitud GET al backend para obtener recomendaciones
         fetch('/recommendations')
@@ -59,7 +69,6 @@
     </script>
 
     <script src="./static/js/pro-animation.js"></script>
-
 
 </body>
 </html>
