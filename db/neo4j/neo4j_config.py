@@ -9,7 +9,7 @@ class Neo4jConnection:
 
     def get_session(self):
         return self._driver.session()
-
+ 
 # Configuración de la conexión
 neo4j_uri = "neo4j+s://9ec1c257.databases.neo4j.io"
 neo4j_user = "neo4j"
