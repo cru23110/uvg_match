@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://kit.fontawesome.com/1bcb8b5e39.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="../static/css/login.css">
+</head>
+<body>
+    <!-- ------- Header ------- -->
+    <header class="header">
+        <div class="logo-container">
+            <a href="/" class="logo-link">
+                <img src="../static/img/uvg_match.png" alt="Logo">
+            </a>
+        </div>
+        <div class="pro-container">
+            <button class="pro-control">
+                <img src="options-icon.svg" alt="Pro Icon">
+            </button>
+        </div>
+        <div class="user-icon-container">
+            <a href="#" class="user-icon-link">
+                <i class="fa-regular fa-circle-user"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- ------- Form ------- -->
+    <div class="login-container">
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <!-- ------- Footer ------- -->
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2024 Grupo 1. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- ------- Scripts ------- -->
+    <script>
+        // Realizar una solicitud GET al backend para obtener recomendaciones
+        fetch('/recommendations')
+            .then(response => response.json())
+            .then(data => {
+                // Manipular los datos recibidos y mostrar las recomendaciones en la página
+                const recommendationsList = document.getElementById('recommendations');
+                data.forEach(recommendation => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = recommendation;
+                    recommendationsList.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error al obtener las recomendaciones:', error));
+    </script>
+
+    <script src="./static/js/pro-animation.js"></script>
+
+</body>
+</html>
