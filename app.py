@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from src.recommendation_algorithm import ContentBasedRecommendation
-from src.authentication import authenticate_user, get_user_id
+from src.authentication import authenticate_user, get_user_id, get_username_by_id, register_user
 from db.neo4j.neo4j_config import neo4j_connection
 
 app = Flask(__name__)
@@ -9,10 +9,6 @@ app.secret_key = 'HjbRlkNgrFNkmws'
 # Crear una instancia del algoritmo de recomendación
 recommendation_system = ContentBasedRecommendation()
 
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
-
 # Ruta para la página principal
 @app.route('/')
 def index():
@@ -20,14 +16,27 @@ def index():
     if 'user_id' not in session:
         # Si no hay un usuario logueado, redirigir a la página de inicio de sesión
         return redirect(url_for('login'))
+    
+    # Obtener el ID del usuario activo en la sesión
+    user_id = session.get('user_id')
 
+    # Obtener el nombre de usuario correspondiente al ID del usuario
+    current_user = get_username_by_id(user_id)
+    
     # Renderizar la página principal
-    return render_template('index.html')
+    return render_template('index.html', current_user=current_user)
 
 
 @app.route('/pro_version')
 def pro_version():
-    return render_template('pro_version.html')
+    # Obtener el ID del usuario activo en la sesión
+    user_id = session.get('user_id')
+    
+    # Obtener el nombre de usuario correspondiente al ID del usuario
+    current_user = get_username_by_id(user_id)
+    
+    # Renderizar la página principal
+    return render_template('pro_version.html', current_user=current_user)
 
 @app.route('/test')
 def test_connection():
@@ -62,12 +71,6 @@ def recommendation():
     # Imprimir el perfil recomendado
     return "Perfil recomendado: {}".format(recommended_profile)
 
-# @app.route('/login/<int:user_id>')
-# def login(user_id):
-#     # Simular el inicio de sesión asignando el ID de usuario a la sesión
-#     session['user_id'] = user_id
-#     return "Usuario {} logueado".format(user_id)
-
 # Función para la página de inicio de sesión
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -86,11 +89,28 @@ def login():
     # Si el método es GET o las credenciales son incorrectas, renderizar la página de inicio de sesión
     return render_template('login.html')
 
+# Ruta para la página de registro de usuarios
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        # Obtener las credenciales del formulario de registro
+        username = request.form['username']
+        password = request.form['password']
+        
+        # Registrar al nuevo usuario en la base de datos
+        register_user(username, password)
+        
+        # Redirigir al usuario a la página de inicio de sesión después de registrarse
+        return redirect(url_for('login'))
+    
+    # Renderizar la página de registro de usuarios
+    return render_template('register.html')
+
 # Ruta para cerrar sesión
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 def logout():
     # Eliminar la sesión del usuario al cerrar sesión
-    session.pop('username', None)
+    session.pop('user_id', None)
     return redirect(url_for('login'))
 
 
