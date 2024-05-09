@@ -1,0 +1,38 @@
+/* Estilos para el formulario */
+form {
+    max-width: 600px;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+/* Estilos para los campos */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+}
+
+.field-description {
+    color: #666;
+}
+
+/* Estilos para los select múltiples */
+select[multiple] {
+    height: auto;
+}
+
+/* Estilos para el botón de enviar */
+button[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
