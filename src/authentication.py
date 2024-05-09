@@ -46,3 +46,17 @@ def get_username_by_id(user_id):
             return record["username"]
         else:
             return None
+
+def obtener_ultimo_user_id():
+    with neo4j_connection.get_session() as session:
+        result = session.run(
+            """
+            MATCH (u:Usuario)
+            RETURN max(u.id_usuario) as user_id
+            """
+        )
+        record = result.single()
+        if record:
+            return record['user_id']
+        else:
+            return None
