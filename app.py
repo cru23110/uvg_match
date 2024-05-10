@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from src.recommendation_algorithm import ContentBasedRecommendation
 from src.authentication import authenticate_user, get_user_id, get_username_by_id, obtener_ultimo_user_id, register_user
 from db.neo4j_config import neo4j_connection
@@ -108,6 +108,11 @@ def register():
         username = request.form['username']
         password = request.form['password']
         
+        # Verificar si tanto el nombre de usuario como la contraseña no están vacíos
+        if not username.strip() or not password.strip():
+            # Redirigir al usuario nuevamente a la página de registro
+            return redirect(url_for('register'))
+        
         # Registrar al nuevo usuario en la base de datos
         register_user(username, password)
         
@@ -154,9 +159,9 @@ def save_preferences():
     intereses = deportes + musica + peliculas + pasatiempos + tecnologia + cultura + estilo_vida
     
     # Guardar las preferencias en la base de datos
-    preferences_db.save_preferences(user_id, gender_preference, edad_minima, edad_maxima, distancia_minima, distancia_maxima,
-                         altura_minima, altura_maxima, religion, other_religion, relationship_status, intereses,
-                         relationship_type, other_relationship, smoker_preference, drinker_preference, education_level)
+    preferences_db.save_preferences(user_id, gender_preference, edad_minima, edad_maxima, distancia_minima, distancia_maxima, 
+                                    altura_minima, altura_maxima, religion, other_religion, relationship_status, intereses, 
+                                    relationship_type, other_relationship, smoker_preference, drinker_preference, education_level)
     
     # Imprimir los datos recibidos
     # print("id:", user_id)
