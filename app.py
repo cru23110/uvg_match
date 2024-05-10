@@ -111,8 +111,8 @@ def register():
         # Registrar al nuevo usuario en la base de datos
         register_user(username, password)
         
-        # Redirigir al usuario a la página de inicio de sesión después de registrarse
-        return redirect(url_for('login'))
+        # Redirigir al usuario a la página de preferencias después de registrarse
+        return redirect(url_for('preferences'))
     
     # Renderizar la página de registro de usuarios
     return render_template('register.html')
@@ -184,7 +184,8 @@ def save_preferences():
     # print("Bebedor:", drinker_preference)
     # print("Nivel educativo:", education_level)
     
-    return "Preferencias guardadas correctamente"
+    # Redirigir al usuario a la página de inicio de sesión después de guardar las preferencias
+    return redirect(url_for('login'))
 
 # Ruta para cerrar sesión
 @app.route('/logout', methods=['POST'])

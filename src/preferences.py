@@ -1,23 +1,3 @@
-# from db.neo4j.neo4j_config import neo4j_connection
-
-# class PreferencesDB:
-#     def __init__(self):
-#         pass
-
-#     def save_preferences(self, user_id, preferences):
-#         with neo4j_connection.get_session() as session:
-#             for preference in preferences:
-#                 session.run(
-#                     """
-#                     MATCH (u:Usuario {id_usuario: $user_id})
-#                     MERGE (u)-[:TIENE_PREFERENCIA_PRINCIPAL {tipo: $tipo}]->(pp:PreferenciaPrincipal {nombre: $nombre, valor: $valor})
-#                     """,
-#                     user_id=user_id,
-#                     tipo=preference['tipo'],
-#                     nombre=preference['nombre'],
-#                     valor=preference['valor']
-#                 )
-
 from db.neo4j.neo4j_config import neo4j_connection
 
 class PreferencesDB:
