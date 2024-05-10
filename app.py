@@ -155,8 +155,8 @@ def save_preferences():
     
     # Guardar las preferencias en la base de datos
     preferences_db.save_preferences(user_id, gender_preference, edad_minima, edad_maxima, distancia_minima, distancia_maxima,
-                         altura_minima, altura_maxima, religion, relationship_status, intereses,
-                         relationship_type, smoker_preference, drinker_preference, education_level)
+                         altura_minima, altura_maxima, religion, other_religion, relationship_status, intereses,
+                         relationship_type, other_relationship, smoker_preference, drinker_preference, education_level)
     
     # Imprimir los datos recibidos
     # print("id:", user_id)
