@@ -1,4 +1,4 @@
-from db.neo4j.neo4j_config import neo4j_connection
+from db.neo4j_config import neo4j_connection
 
 class PreferencesDB:
     def __init__(self):
@@ -24,7 +24,7 @@ class PreferencesDB:
             {'tipo': 'Nivel Educativo', 'nombre': 'education_level', 'valor': education_level}
         ]
 
-        # print("preferences:", preferences)
+        print("preferences:", preferences)
 
         with neo4j_connection.get_session() as session:
             for preference in preferences:

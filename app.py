@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from src.recommendation_algorithm import ContentBasedRecommendation
 from src.authentication import authenticate_user, get_user_id, get_username_by_id, obtener_ultimo_user_id, register_user
-from db.neo4j.neo4j_config import neo4j_connection
+from db.neo4j_config import neo4j_connection
 from src.preferences import PreferencesDB
 
 app = Flask(__name__)

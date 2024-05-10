@@ -1,5 +1,5 @@
 from flask import Flask
-from db.neo4j.neo4j_config import neo4j_connection
+from db.neo4j_config import neo4j_connection
 import random
 
 app = Flask(__name__)
