@@ -53,10 +53,19 @@ def test_connection():
         preferences_result = session.run("MATCH (u:Usuario)-[:LE_GUSTA]->(g:Gusto) RETURN u.id_usuario AS user_id, g.nombre AS gusto")
         preferences = [record for record in preferences_result]
 
+        users_preferences_result = session.run("""
+            MATCH (u:Usuario)-[:TIENE_PREFERENCIA_PRINCIPAL]->(pp:PreferenciaPrincipal)
+            RETURN u.id_usuario AS user_id, u.nombre AS nombre, pp.tipo AS tipo_preferencia, pp.valor AS valor_preferencia
+        """)
+
+        users_preferences = [record for record in users_preferences_result]
+        print("preferencias:", users_preferences)
+        
     data = {
         'users': users,
         'profiles': profiles,
-        'preferences': preferences
+        'preferences': preferences,
+        'users_preferences': users_preferences
     }
     return jsonify(data)
 
@@ -113,59 +122,6 @@ def preferences():
     return render_template('preferences_form.html')
 
 # Ruta para guardar las preferencias del usuario
-# @app.route('/save_preferences', methods=['POST'])
-# def save_preferences():
-#     # Recuperar los datos del formulario
-#     gender_preference = request.form.get('gender_preference')
-#     edad_minima = request.form.get('edad_minima')
-#     edad_maxima = request.form.get('edad_maxima')
-#     distancia_minima = request.form.get('distancia_minima')
-#     distancia_maxima = request.form.get('distancia_maxima')
-#     altura_minima = request.form.get('altura_minima')
-#     altura_maxima = request.form.get('altura_maxima')
-#     religion = request.form.get('religion')
-#     other_religion = request.form.get('other_religion') if religion == 'otro' else None
-#     relationship_status = request.form.get('relationship_status')
-#     deportes = request.form.getlist('deportes[]')
-#     musica = request.form.getlist('musica[]')
-#     peliculas = request.form.getlist('peliculas[]')
-#     pasatiempos = request.form.getlist('pasatiempos[]')
-#     tecnologia = request.form.getlist('tecnologia[]')
-#     cultura = request.form.getlist('cultura[]')
-#     estilo_vida = request.form.getlist('estilo_vida[]')
-#     relationship_type = request.form.get('relationship_type')
-#     other_relationship = request.form.get('other_relationship') if relationship_type == 'otras' else None
-#     smoker_preference = request.form.get('smoker_preference')
-#     drinker_preference = request.form.get('drinker_preference')
-#     education_level = request.form.get('education_level')
-    
-#     # Imprimir los datos recibidos
-#     print("Preferencia de género:", gender_preference)
-#     print("Edad mínima:", edad_minima)
-#     print("Edad máxima:", edad_maxima)
-#     print("Distancia mínima:", distancia_minima)
-#     print("Distancia máxima:", distancia_maxima)
-#     print("Altura mínima:", altura_minima)
-#     print("Altura máxima:", altura_maxima)
-#     print("Religión:", religion)
-#     print("Otra religión especificada:", other_religion)
-#     print("Estado civil:", relationship_status)
-#     print("Deportes:", deportes)
-#     print("Música:", musica)
-#     print("Películas:", peliculas)
-#     print("Pasatiempos:", pasatiempos)
-#     print("Tecnología:", tecnologia)
-#     print("Cultura:", cultura)
-#     print("Estilo de vida:", estilo_vida)
-#     print("Tipo de relación buscada:", relationship_type)
-#     print("Otro tipo de relación especificado:", other_relationship)
-#     print("Fumador:", smoker_preference)
-#     print("Bebedor:", drinker_preference)
-#     print("Nivel educativo:", education_level)
-    
-    
-#     return "Preferencias guardadas correctamente"
-
 @app.route('/save_preferences', methods=['POST'])
 def save_preferences():
     
@@ -198,35 +154,35 @@ def save_preferences():
     intereses = deportes + musica + peliculas + pasatiempos + tecnologia + cultura + estilo_vida
     
     # Guardar las preferencias en la base de datos
-    # preferences_db.save_preferences(user_id, gender_preference, edad_minima, edad_maxima, distancia_minima, distancia_maxima,
-    #                      altura_minima, altura_maxima, religion, relationship_status, intereses,
-    #                      relationship_type, smoker_preference, drinker_preference, education_level)
+    preferences_db.save_preferences(user_id, gender_preference, edad_minima, edad_maxima, distancia_minima, distancia_maxima,
+                         altura_minima, altura_maxima, religion, relationship_status, intereses,
+                         relationship_type, smoker_preference, drinker_preference, education_level)
     
     # Imprimir los datos recibidos
-    print("id:", user_id)
-    print("Preferencia de género:", gender_preference)
-    print("Edad mínima:", edad_minima)
-    print("Edad máxima:", edad_maxima)
-    print("Distancia mínima:", distancia_minima)
-    print("Distancia máxima:", distancia_maxima)
-    print("Altura mínima:", altura_minima)
-    print("Altura máxima:", altura_maxima)
-    print("Religión:", religion)
-    print("Otra religión especificada:", other_religion)
-    print("Estado civil:", relationship_status)
-    print("Deportes:", deportes)
-    print("Música:", musica)
-    print("Películas:", peliculas)
-    print("Pasatiempos:", pasatiempos)
-    print("Tecnología:", tecnologia)
-    print("Cultura:", cultura)
-    print("Estilo de vida:", estilo_vida)
-    print("Intereses:", intereses)
-    print("Tipo de relación buscada:", relationship_type)
-    print("Otro tipo de relación especificado:", other_relationship)
-    print("Fumador:", smoker_preference)
-    print("Bebedor:", drinker_preference)
-    print("Nivel educativo:", education_level)
+    # print("id:", user_id)
+    # print("Preferencia de género:", gender_preference)
+    # print("Edad mínima:", edad_minima)
+    # print("Edad máxima:", edad_maxima)
+    # print("Distancia mínima:", distancia_minima)
+    # print("Distancia máxima:", distancia_maxima)
+    # print("Altura mínima:", altura_minima)
+    # print("Altura máxima:", altura_maxima)
+    # print("Religión:", religion)
+    # print("Otra religión especificada:", other_religion)
+    # print("Estado civil:", relationship_status)
+    # print("Deportes:", deportes)
+    # print("Música:", musica)
+    # print("Películas:", peliculas)
+    # print("Pasatiempos:", pasatiempos)
+    # print("Tecnología:", tecnologia)
+    # print("Cultura:", cultura)
+    # print("Estilo de vida:", estilo_vida)
+    # print("Intereses:", intereses)
+    # print("Tipo de relación buscada:", relationship_type)
+    # print("Otro tipo de relación especificado:", other_relationship)
+    # print("Fumador:", smoker_preference)
+    # print("Bebedor:", drinker_preference)
+    # print("Nivel educativo:", education_level)
     
     return "Preferencias guardadas correctamente"
 

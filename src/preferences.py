@@ -1,45 +1,61 @@
+# from db.neo4j.neo4j_config import neo4j_connection
+
+# class PreferencesDB:
+#     def __init__(self):
+#         pass
+
+#     def save_preferences(self, user_id, preferences):
+#         with neo4j_connection.get_session() as session:
+#             for preference in preferences:
+#                 session.run(
+#                     """
+#                     MATCH (u:Usuario {id_usuario: $user_id})
+#                     MERGE (u)-[:TIENE_PREFERENCIA_PRINCIPAL {tipo: $tipo}]->(pp:PreferenciaPrincipal {nombre: $nombre, valor: $valor})
+#                     """,
+#                     user_id=user_id,
+#                     tipo=preference['tipo'],
+#                     nombre=preference['nombre'],
+#                     valor=preference['valor']
+#                 )
+
 from db.neo4j.neo4j_config import neo4j_connection
 
 class PreferencesDB:
     def __init__(self):
         pass
 
-    def save_preferences(self, user_id, gender_preference, min_age, max_age, min_distance, max_distance,
-                         min_height, max_height, religion, relationship_status, interests,
+    def save_preferences(self, user_id, gender_preference, edad_minima, edad_maxima, distancia_minima, distancia_maxima,
+                         altura_minima, altura_maxima, religion, relationship_status, intereses,
                          relationship_type, smoker_preference, drinker_preference, education_level):
-        # Guardar las preferencias en la base de datos
+        preferences = [
+            {'tipo': 'Genero', 'nombre': 'gender_preference', 'valor': gender_preference},
+            {'tipo': 'Edad', 'nombre': 'edad_minima', 'valor': edad_minima},
+            {'tipo': 'Edad', 'nombre': 'edad_maxima', 'valor': edad_maxima},
+            {'tipo': 'Distancia', 'nombre': 'distancia_minima', 'valor': distancia_minima},
+            {'tipo': 'Distancia', 'nombre': 'distancia_maxima', 'valor': distancia_maxima},
+            {'tipo': 'Altura', 'nombre': 'altura_minima', 'valor': altura_minima},
+            {'tipo': 'Altura', 'nombre': 'altura_maxima', 'valor': altura_maxima},
+            {'tipo': 'Religion', 'nombre': 'religion', 'valor': religion},
+            {'tipo': 'Estado Civil', 'nombre': 'relationship_status', 'valor': relationship_status},
+            {'tipo': 'Intereses', 'nombre': 'intereses', 'valor': intereses},
+            {'tipo': 'Tipo de Relacion', 'nombre': 'relationship_type', 'valor': relationship_type},
+            {'tipo': 'Fumador', 'nombre': 'smoker_preference', 'valor': smoker_preference},
+            {'tipo': 'Bebedor', 'nombre': 'drinker_preference', 'valor': drinker_preference},
+            {'tipo': 'Nivel Educativo', 'nombre': 'education_level', 'valor': education_level}
+        ]
+
+        # print("preferences:", preferences)
+
         with neo4j_connection.get_session() as session:
-            session.run(
-                """
-                MERGE (u:Usuario {id_usuario: $user_id})
-                SET u.genero_preferido = $gender_preference,
-                    u.edad_minima = $min_age,
-                    u.edad_maxima = $max_age,
-                    u.distancia_minima = $min_distance,
-                    u.distancia_maxima = $max_distance,
-                    u.altura_minima = $min_height,
-                    u.altura_maxima = $max_height,
-                    u.religion = $religion,
-                    u.estado_civil = $relationship_status,
-                    u.intereses = $interests,
-                    u.tipo_relacion_buscada = $relationship_type,
-                    u.fumador = $smoker_preference,
-                    u.bebedor = $drinker_preference,
-                    u.nivel_educativo = $education_level
-                """,
-                user_id=user_id,
-                gender_preference=gender_preference,
-                min_age=min_age,
-                max_age=max_age,
-                min_distance=min_distance,
-                max_distance=max_distance,
-                min_height=min_height,
-                max_height=max_height,
-                religion=religion,
-                relationship_status=relationship_status,
-                interests=interests,
-                relationship_type=relationship_type,
-                smoker_preference=smoker_preference,
-                drinker_preference=drinker_preference,
-                education_level=education_level
-            )
+            for preference in preferences:
+                session.run(
+                    """
+                    MATCH (u:Usuario {id_usuario: $user_id})
+                    MERGE (u)-[:TIENE_PREFERENCIA_PRINCIPAL {tipo: $tipo}]->(pp:PreferenciaPrincipal {nombre: $nombre, valor: $valor})
+                    """,
+                    user_id=user_id,
+                    tipo=preference['tipo'],
+                    nombre=preference['nombre'],
+                    valor=preference['valor']
+                )
+
