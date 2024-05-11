@@ -1,5 +1,5 @@
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
-from src.recommendation_algorithm import ContentBasedRecommendation
+from src.recommendation_system.profile_generation_manager import generate_new_profile
 from src.authentication import authenticate_user, get_user_id, get_username_by_id, obtener_ultimo_user_id, register_user
 from db.neo4j_config import neo4j_connection
 from src.preferences import PreferencesDB
@@ -7,8 +7,7 @@ from src.preferences import PreferencesDB
 app = Flask(__name__)
 
 app.secret_key = 'HjbRlkNgrFNkmws'
-# Crear una instancia del algoritmo de recomendación
-recommendation_system = ContentBasedRecommendation()
+
 # Crear una instancia del manejo de preferencias de usuario
 preferences_db = PreferencesDB()
 
@@ -69,18 +68,20 @@ def test_connection():
     }
     return jsonify(data)
 
-@app.route('/recommendation')
-def recommendation():
-    if 'user_id' not in session:
-        # Si no hay un usuario logueado, redirigir a la página de login
-        return redirect(url_for('login'))
-
-    # Recomendar un perfil para el usuario logueado
-    user_id = session['user_id']
-    recommended_profile = recommendation_system.recommend_profiles(user_id)
-
-    # Imprimir el perfil recomendado
-    return "Perfil recomendado: {}".format(recommended_profile)
+# Ruta para generar un nuevo perfil
+@app.route('/generate_new_profile')
+def generate_new_profile_route():
+    # Obtener el ID del usuario activo
+    user_id = session.get('user_id')
+    if user_id:
+        # Llamar a la función para generar el nuevo perfil
+        result = generate_new_profile(user_id)
+        if result:
+            return "Nuevo perfil generado exitosamente"
+        else:
+            return "Error al generar el nuevo perfil"
+    else:
+        return "Usuario no autenticado"
 
 # Función para la página de inicio de sesión
 @app.route('/login', methods=['GET', 'POST'])
