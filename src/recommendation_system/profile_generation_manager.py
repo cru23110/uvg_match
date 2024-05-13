@@ -1,8 +1,17 @@
 from src.recommendation_system.preferences_primary import PrimaryPreferences
+from src.recommendation_system.recommendation_algorithm import RecommendationAlgorithm
+
 
 def generate_new_profile(user_id):
-    primary_preferences = PrimaryPreferences()
-    nuevo_perfil = primary_preferences.generate_profile(user_id)
-    print(nuevo_perfil)
-    # Devolver True si el proceso fue exitoso
+    # Obtener las preferencias primarias del usuario
+    primary_preferences = PrimaryPreferences().generate_profile(user_id)
+    print("Caracteristicas primarias:", primary_preferences)
+
+    # Generar el nuevo perfil
+    # secondary_preferences = RecommendationAlgorithm().get_user_likes(user_id)
+    # print("Caracteristicas secundarias:", secondary_preferences)
+
+    # # Generar el nuevo perfil
+    # secondary_preferences = RecommendationAlgorithm().get_random_user_likes()
+    # print("random secundarias:", secondary_preferences)
     return True

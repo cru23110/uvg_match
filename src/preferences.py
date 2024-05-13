@@ -26,7 +26,7 @@ class PreferencesDB:
             {'tipo': 'Nivel Educativo', 'nombre': 'education_level', 'valor': education_level}
         ]
 
-        print("preferences:", preferences)
+        # print("preferences:", preferences)
 
         with neo4j_connection.get_session() as session:
             for preference in preferences:
