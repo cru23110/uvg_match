@@ -15,6 +15,13 @@ def generate_new_profile(user_id):
     # secondary_preferences = RecommendationAlgorithm().get_random_user_likes()
     # print("random secundarias:", secondary_preferences)
 
-    prueba = RecommendationAlgorithm().ordenar_gustos(user_id)
-    print(prueba)
+    # prueba = RecommendationAlgorithm().ordenar_gustos(user_id)
+    # print(prueba)
+
+    # recomendaciones = RecommendationAlgorithm().ejecutar_tecnicas_de_seleccion(user_id)
+    # print(recomendaciones)
+
+    RecommendationAlgorithm().ejecutar_tecnicas_de_seleccion(user_id)
+
+    
     return True

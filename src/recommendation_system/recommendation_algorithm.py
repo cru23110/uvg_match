@@ -1,4 +1,5 @@
 from db.neo4j_config import neo4j_connection
+import random
 
 class RecommendationAlgorithm:
     def __init__(self):
@@ -95,3 +96,63 @@ class RecommendationAlgorithm:
         # random_user_likes_sorted = sorted(random_user_likes, key=lambda x: x["puntaje"], reverse=True)
         
         return user_likes_sorted
+
+    def seleccionar_gustos_ponderados(self, gustos, cantidad_gustos):
+        # Calcular las probabilidades de selección basadas en los puntajes
+        puntajes = [gusto['puntaje'] for gusto in gustos]
+        total_puntajes = sum(puntajes)
+        probabilidades = [puntaje / total_puntajes for puntaje in puntajes]
+
+        # Realizar muestreo aleatorio ponderado
+        seleccionados = random.choices(gustos, weights=probabilidades, k=cantidad_gustos)
+
+        return seleccionados
+
+    def seleccionar_gustos_cuartiles(self, gustos, cantidad_gustos):
+        # Ordenar gustos por puntaje
+        gustos_ordenados = sorted(gustos, key=lambda x: x['puntaje'], reverse=True)
+
+        # Dividir gustos en cuartiles
+        cuartiles = [gustos_ordenados[i::cantidad_gustos] for i in range(cantidad_gustos)]
+
+        # Seleccionar un gusto de cada cuartil
+        seleccionados = [random.choice(cuartil) for cuartil in cuartiles]
+
+        return seleccionados
+
+    def seleccionar_gustos_epsilon_greedy(self, gustos, cantidad_gustos, epsilon=0.1):
+        # Ordenar gustos por puntaje
+        gustos_ordenados = sorted(gustos, key=lambda x: x['puntaje'], reverse=True)
+
+        # Elegir gustos con explotación (basado en puntajes más altos)
+        explotacion = gustos_ordenados[:cantidad_gustos]
+
+        # Elegir gustos con exploración (al azar)
+        exploracion = random.choices(gustos, k=cantidad_gustos)
+
+        # Aplicar técnica ε-greedy
+        seleccionados = explotacion if random.random() > epsilon else exploracion
+
+        return seleccionados
+
+    def ejecutar_tecnicas_de_seleccion(self, user_id):
+        # Obtener gustos ordenados del usuario
+        gustos_ordenados = self.ordenar_gustos(user_id)
+
+        # Seleccionar la cantidad de gustos
+        cantidad_gustos = 5
+
+        print(f"Cantidad de gustos: {cantidad_gustos}")
+
+        print("Muestreo aleatorio ponderado:")
+        seleccionados_ponderados = self.seleccionar_gustos_ponderados(gustos_ordenados, cantidad_gustos)
+        print(seleccionados_ponderados)
+
+        print("\nSelección basada en cuartiles:")
+        seleccionados_cuartiles = self.seleccionar_gustos_cuartiles(gustos_ordenados, cantidad_gustos)
+        print(seleccionados_cuartiles)
+
+        print("\nTécnica ε-greedy:")
+        seleccionados_epsilon_greedy = self.seleccionar_gustos_epsilon_greedy(gustos_ordenados, cantidad_gustos)
+        print(seleccionados_epsilon_greedy)
+        
