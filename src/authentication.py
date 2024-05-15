@@ -31,7 +31,11 @@ def register_user(username, password):
         last_id = result.single().get('last_id', 0)
 
         # Generar un nuevo ID para el usuario
-        new_id = last_id + 1
+        # Si last_id es None, significa que no hay usuarios en la base de datos
+        if last_id is None:
+            new_id = 1
+        else:
+            new_id = last_id + 1
 
         # Insertar el nuevo usuario en la base de datos
         session.run("CREATE (u:Usuario {id_usuario: $new_id, nombre: $username, password: $password})", 
