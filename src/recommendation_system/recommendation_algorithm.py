@@ -2,7 +2,7 @@ from db.neo4j_config import neo4j_connection
 from src.recommendation_system.preferences_primary import PrimaryPreferences
 import random
 
-class RecommendationAlgorithm:
+class UserLikesProcessor:
     def __init__(self):
         pass
 
@@ -194,26 +194,53 @@ class SimilarUserFinder:
 
         return similarity_count
     
-class RecommendationManager:
+class GustosCombiner:
     @staticmethod
     def obtener_gustos_combinados(user_id):
         # Ejecutar técnicas de selección para el usuario en sesión
-        gustos_usuario_sesion = RecommendationAlgorithm().ejecutar_tecnicas_de_seleccion(user_id, 5)
+        gustos_usuario_sesion = UserLikesProcessor().ejecutar_tecnicas_de_seleccion(user_id, 5)
 
         # Encontrar usuario más similar
         id_usuario_similar = SimilarUserFinder().find_similar_user(user_id)
 
         if id_usuario_similar:
             # Ejecutar técnicas de selección para el usuario más similar
-            gustos_usuario_similar = RecommendationAlgorithm().ejecutar_tecnicas_de_seleccion(id_usuario_similar, 3)
+            gustos_usuario_similar = UserLikesProcessor().ejecutar_tecnicas_de_seleccion(id_usuario_similar, 3)
 
             # Verificar si hay gustos repetidos
             gustos_totales = gustos_usuario_sesion + gustos_usuario_similar
             gustos_totales_uniq = []
             for gusto in gustos_totales:
-                if not RecommendationAlgorithm().verificar_gusto_repetido(gusto, gustos_totales_uniq):
+                if not UserLikesProcessor().verificar_gusto_repetido(gusto, gustos_totales_uniq):
                     gustos_totales_uniq.append(gusto)
+
+            # Sumar puntajes
+            puntaje_total = GustosCombiner.sumar_puntajes(gustos_totales_uniq)
+            print(puntaje_total)
+            # Eliminar campos y guardar en la lista de propiedades
+            gustos_totales_uniq = GustosCombiner.eliminar_propiedades(gustos_totales_uniq)
         else:
+            # Sumar puntajes
+            puntaje_total = GustosCombiner.sumar_puntajes(gustos_usuario_sesion)
+            print(puntaje_total)
+
+            # Si no hay usuario similar, solo eliminar campos del usuario en sesión
+            gustos_usuario_sesion = GustosCombiner.eliminar_propiedades(gustos_usuario_sesion)
             gustos_totales_uniq = gustos_usuario_sesion
 
         return gustos_totales_uniq
+    
+    @staticmethod
+    def sumar_puntajes(gustos):
+        puntaje_total = sum(gusto.get('puntaje', 0) for gusto in gustos)
+        puntaje_total = round(puntaje_total, 3)
+        return puntaje_total
+
+    @staticmethod
+    def eliminar_propiedades(gustos):
+        propiedades = ['veces_utilizado', 'likes', 'puntaje'] #Eliminar la categoria de esta lista que se desea que se muestre otra vez
+        for gusto in gustos:
+            for propiedad in propiedades:
+                if propiedad in gusto:
+                    del gusto[propiedad]
+        return gustos
