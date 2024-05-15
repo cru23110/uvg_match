@@ -1,3 +1,4 @@
+from flask import json
 from src.recommendation_system.preferences_primary import PrimaryPreferences
 from src.recommendation_system.recommendation_algorithm import GustosCombiner
 from db.neo4j_config import neo4j_connection
@@ -7,6 +8,11 @@ def generate_new_profile(user_id):
     primary_preferences = PrimaryPreferences().generate_profile(user_id)
     gustos, puntuacion_perfil = GustosCombiner().obtener_gustos_combinados(user_id)
 
+    # Reemplazar los guiones bajos por espacios en las cadenas del diccionario
+    for key, value in primary_preferences.items():
+        if isinstance(value, str):
+            primary_preferences[key] = value.replace('_', ' ')
+
     # Organizar gustos por categoría
     categorias_gustos = {}
     for gusto in gustos:
@@ -14,6 +20,15 @@ def generate_new_profile(user_id):
         if categoria not in categorias_gustos:
             categorias_gustos[categoria] = []
         categorias_gustos[categoria].append(gusto['nombre'])
+
+    # Convertir el diccionario de categorías a una cadena JSON
+    gustos_json = json.dumps(categorias_gustos)
+
+    # Deserializar la cadena JSON a un diccionario
+    # gustos_dict = json.loads(gustos_json)
+
+    # Imprimir el diccionario para verificar su contenido
+    # print(gustos_dict)
 
     # Obtener solo los IDs de los gustos
     ids_gustos = [gusto['gusto_id'] for gusto in gustos]
@@ -48,17 +63,16 @@ def generate_new_profile(user_id):
         'Preferencia de fumador': primary_preferences['Preferencia de fumador'],
         'Preferencia de bebedor': primary_preferences['Preferencia de bebedor'],
         'Nivel educativo': primary_preferences['Nivel educativo'],
-        'Gustos': categorias_gustos,
+        'Gustos': gustos_json,
         'IDs de gustos': ids_gustos,
         'Puntuacion del perfil': puntuacion_perfil,
         'Path de la imagen': '/path/to/image'  # Reemplaza con el path real
     }
     print(nuevo_perfil)
     # Guardar el perfil en la base de datos
-    # save_new_profile(nuevo_perfil)
+    save_new_profile(nuevo_perfil, user_id)
 
     return True
-
 
 def generate_description(nombre, genero, edad, intereses, tipo_relacion):
     # Construir la descripción basada en las características proporcionadas
@@ -94,10 +108,11 @@ def get_max_profile_id():
         max_profile_id = record["max_profile_id"] if record["max_profile_id"] is not None else 0
     return max_profile_id
 
-def save_new_profile(nuevo_perfil):
+def save_new_profile(nuevo_perfil, user_id):
     with neo4j_connection.get_session() as session:
         session.run(
             """
+            MATCH (u:Usuario {id_usuario: $user_id})
             CREATE (p:Perfil {
                 user_id: $user_id,
                 profile_id: $profile_id,
@@ -119,8 +134,9 @@ def save_new_profile(nuevo_perfil):
                 `Puntuacion del perfil`: $Puntuacion_del_perfil,
                 `Path de la imagen`: $Path_de_la_imagen
             })
+            CREATE (u)-[:TIENE_PERFIL]->(p)
             """,
-            user_id=nuevo_perfil['user_id'],
+            user_id=user_id,
             profile_id=nuevo_perfil['profile_id'],
             Nombre=nuevo_perfil['Nombre'],
             Descripcion=nuevo_perfil['Descripcion'],
@@ -141,3 +157,4 @@ def save_new_profile(nuevo_perfil):
             Path_de_la_imagen=nuevo_perfil['Path de la imagen']
         )
     return True
+
