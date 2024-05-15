@@ -1,4 +1,5 @@
 from db.neo4j_config import neo4j_connection
+from src.recommendation_system.preferences_primary import PrimaryPreferences
 import random
 
 class RecommendationAlgorithm:
@@ -29,34 +30,6 @@ class RecommendationAlgorithm:
                 if record["likes"] > max_likes:
                     max_likes = record["likes"]
         return user_likes, max_likes
-    
-    def get_random_user_likes(self):
-        random_user_likes = []
-        max_likes = 0
-        with neo4j_connection.get_session() as session:
-            result = session.run(
-                """
-                MATCH (u:Usuario)-[:TIENE_GUSTO]->(gusto)
-                WITH u, COLLECT(gusto) AS gustos
-                ORDER BY rand()
-                LIMIT 1
-                UNWIND gustos AS gusto
-                RETURN gusto.gusto_id AS gusto_id, gusto.nombre AS nombre_gusto, gusto.clase AS clase_gusto, gusto.veces_utilizado AS veces_utilizado, gusto.likes AS likes
-                """
-            )
-            for record in result:
-                gusto_info = {
-                    "gusto_id": record["gusto_id"],
-                    "nombre": record["nombre_gusto"],
-                    "clase": record["clase_gusto"],
-                    "veces_utilizado": record["veces_utilizado"],
-                    "likes": record["likes"]
-                }
-                random_user_likes.append(gusto_info)
-                # Actualizar el máximo de likes
-                if record["likes"] > max_likes:
-                    max_likes = record["likes"]
-        return random_user_likes, max_likes
 
     def calcular_puntaje(self, gusto, max_likes):
         # Normalización de datos
@@ -85,19 +58,17 @@ class RecommendationAlgorithm:
         # Ordenar gustos del usuario por puntaje descendente
         user_likes_sorted = sorted(user_likes, key=lambda x: x["puntaje"], reverse=True)
         
-        # # Obtener gustos aleatorios y el máximo de likes
-        # random_user_likes, max_likes_random = self.get_random_user_likes()
-        
-        # # Calcular puntaje para cada gusto aleatorio
-        # for gusto in random_user_likes:
-        #     gusto["puntaje"] = self.calcular_puntaje(gusto, max_likes_random)
-        
-        # # Ordenar gustos aleatorios por puntaje descendente
-        # random_user_likes_sorted = sorted(random_user_likes, key=lambda x: x["puntaje"], reverse=True)
-        
         return user_likes_sorted
 
-    def seleccionar_gustos_ponderados(self, gustos, cantidad_gustos):
+    def verificar_gusto_repetido(self, gusto, gustos_seleccionados):
+        for gusto_seleccionado in gustos_seleccionados:
+            if gusto['gusto_id'] == gusto_seleccionado['gusto_id'] \
+                    or gusto['nombre'] == gusto_seleccionado['nombre'] \
+                    or (gusto['clase'] in ['Color de ojos', 'Rasgo físico'] and gusto['clase'] == gusto_seleccionado['clase']):
+                return True
+        return False
+
+    def seleccionar_gustos_ponderados(self, gustos, cantidad_gustos=5):
         # Calcular las probabilidades de selección basadas en los puntajes
         puntajes = [gusto['puntaje'] for gusto in gustos]
         total_puntajes = sum(puntajes)
@@ -106,9 +77,16 @@ class RecommendationAlgorithm:
         # Realizar muestreo aleatorio ponderado
         seleccionados = random.choices(gustos, weights=probabilidades, k=cantidad_gustos)
 
-        return seleccionados
+        # Verificar si hay gustos repetidos y volver a seleccionar si es necesario
+        seleccionados_uniq = []
+        for gusto in seleccionados:
+            while self.verificar_gusto_repetido(gusto, seleccionados_uniq):
+                gusto = random.choice(gustos)
+            seleccionados_uniq.append(gusto)
 
-    def seleccionar_gustos_cuartiles(self, gustos, cantidad_gustos):
+        return seleccionados_uniq
+
+    def seleccionar_gustos_cuartiles(self, gustos, cantidad_gustos=5):
         # Ordenar gustos por puntaje
         gustos_ordenados = sorted(gustos, key=lambda x: x['puntaje'], reverse=True)
 
@@ -118,9 +96,16 @@ class RecommendationAlgorithm:
         # Seleccionar un gusto de cada cuartil
         seleccionados = [random.choice(cuartil) for cuartil in cuartiles]
 
-        return seleccionados
+        # Verificar si hay gustos repetidos y volver a seleccionar si es necesario
+        seleccionados_uniq = []
+        for gusto in seleccionados:
+            while self.verificar_gusto_repetido(gusto, seleccionados_uniq):
+                gusto = random.choice(gustos)
+            seleccionados_uniq.append(gusto)
 
-    def seleccionar_gustos_epsilon_greedy(self, gustos, cantidad_gustos, epsilon=0.1):
+        return seleccionados_uniq
+
+    def seleccionar_gustos_epsilon_greedy(self, gustos, cantidad_gustos=5, epsilon=0.1):
         # Ordenar gustos por puntaje
         gustos_ordenados = sorted(gustos, key=lambda x: x['puntaje'], reverse=True)
 
@@ -133,26 +118,102 @@ class RecommendationAlgorithm:
         # Aplicar técnica ε-greedy
         seleccionados = explotacion if random.random() > epsilon else exploracion
 
-        return seleccionados
+        # Verificar si hay gustos repetidos y volver a seleccionar si es necesario
+        seleccionados_uniq = []
+        for gusto in seleccionados:
+            while self.verificar_gusto_repetido(gusto, seleccionados_uniq):
+                gusto = random.choice(gustos)
+            seleccionados_uniq.append(gusto)
 
-    def ejecutar_tecnicas_de_seleccion(self, user_id):
+        return seleccionados_uniq
+
+    def ejecutar_tecnicas_de_seleccion(self, user_id, cantidad_gustos):
         # Obtener gustos ordenados del usuario
         gustos_ordenados = self.ordenar_gustos(user_id)
 
-        # Seleccionar la cantidad de gustos
-        cantidad_gustos = 5
-
-        print(f"Cantidad de gustos: {cantidad_gustos}")
-
-        print("Muestreo aleatorio ponderado:")
+        # print("Muestreo aleatorio ponderado:")
         seleccionados_ponderados = self.seleccionar_gustos_ponderados(gustos_ordenados, cantidad_gustos)
-        print(seleccionados_ponderados)
+        # print(seleccionados_ponderados)
 
-        print("\nSelección basada en cuartiles:")
+        # print("\nSelección basada en cuartiles:")
         seleccionados_cuartiles = self.seleccionar_gustos_cuartiles(gustos_ordenados, cantidad_gustos)
-        print(seleccionados_cuartiles)
+        # print(seleccionados_cuartiles)
 
-        print("\nTécnica ε-greedy:")
+        # print("\nTécnica ε-greedy:")
         seleccionados_epsilon_greedy = self.seleccionar_gustos_epsilon_greedy(gustos_ordenados, cantidad_gustos)
-        print(seleccionados_epsilon_greedy)
-        
+        # print(seleccionados_epsilon_greedy)
+
+        return(seleccionados_ponderados)
+    
+class SimilarUserFinder:
+    def __init__(self):
+        pass
+
+    def find_similar_user(self, current_user_id):
+        # Obtener preferencias primarias del usuario actual
+        current_user_preferences = PrimaryPreferences().get_primary_preferences(current_user_id)
+
+        # Buscar usuarios con preferencias primarias similares
+        similar_users = {}
+        for user_id in self.get_all_user_ids():
+            if user_id != current_user_id:
+                user_preferences = PrimaryPreferences().get_primary_preferences(user_id)
+                similarity_score = self.calculate_similarity(current_user_preferences, user_preferences)
+                similar_users[user_id] = similarity_score
+
+        # Ordenar usuarios por similitud y devolver el más similar
+        most_similar_user_id = max(similar_users, key=similar_users.get) if similar_users else None
+
+        return most_similar_user_id
+
+    def get_all_user_ids(self):
+        # Consultar la base de datos para obtener todos los IDs de usuario
+        all_user_ids = []
+        with neo4j_connection.get_session() as session:
+            result = session.run("MATCH (u:Usuario) RETURN u.id_usuario AS user_id")
+            for record in result:
+                all_user_ids.append(record['user_id'])
+
+        return all_user_ids
+
+    def calculate_similarity(self, preferences1, preferences2):
+        # Calcular la similitud entre dos conjuntos de preferencias primarias
+        similarity_count = 0
+        for preference_key in preferences1:
+            if preference_key in preferences2:
+                preference_value1 = preferences1[preference_key]
+                preference_value2 = preferences2[preference_key]
+                if isinstance(preference_value1, list) and isinstance(preference_value2, list):
+                    # Si ambas preferencias son listas, comparamos sus elementos uno a uno
+                    common_interests = set(preference_value1) & set(preference_value2)
+                    similarity_count += len(common_interests)
+
+                elif preference_value1 == preference_value2:
+                    # Si no son listas, comparamos los valores directamente
+                    similarity_count += 1
+
+        return similarity_count
+    
+class RecommendationManager:
+    @staticmethod
+    def obtener_gustos_combinados(user_id):
+        # Ejecutar técnicas de selección para el usuario en sesión
+        gustos_usuario_sesion = RecommendationAlgorithm().ejecutar_tecnicas_de_seleccion(user_id, 5)
+
+        # Encontrar usuario más similar
+        id_usuario_similar = SimilarUserFinder().find_similar_user(user_id)
+
+        if id_usuario_similar:
+            # Ejecutar técnicas de selección para el usuario más similar
+            gustos_usuario_similar = RecommendationAlgorithm().ejecutar_tecnicas_de_seleccion(id_usuario_similar, 3)
+
+            # Verificar si hay gustos repetidos
+            gustos_totales = gustos_usuario_sesion + gustos_usuario_similar
+            gustos_totales_uniq = []
+            for gusto in gustos_totales:
+                if not RecommendationAlgorithm().verificar_gusto_repetido(gusto, gustos_totales_uniq):
+                    gustos_totales_uniq.append(gusto)
+        else:
+            gustos_totales_uniq = gustos_usuario_sesion
+
+        return gustos_totales_uniq
