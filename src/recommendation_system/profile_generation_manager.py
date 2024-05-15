@@ -1,5 +1,5 @@
 from src.recommendation_system.preferences_primary import PrimaryPreferences
-from src.recommendation_system.recommendation_algorithm import RecommendationManager
+from src.recommendation_system.recommendation_algorithm import GustosCombiner
 
 
 def generate_new_profile(user_id):
@@ -7,6 +7,6 @@ def generate_new_profile(user_id):
     primary_preferences = PrimaryPreferences().generate_profile(user_id)
     print("Caracteristicas primarias:", primary_preferences)
 
-    gustos = RecommendationManager().obtener_gustos_combinados(user_id)
+    gustos = GustosCombiner().obtener_gustos_combinados(user_id)
     print("gustos finales:", gustos)
     return True

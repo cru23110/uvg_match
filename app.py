@@ -40,34 +40,6 @@ def pro_version():
     # Renderizar la página principal
     return render_template('pro_version.html', current_user=current_user)
 
-@app.route('/test')
-def test_connection():
-    with neo4j_connection.get_session() as session:
-        users_result = session.run("MATCH (u:Usuario) RETURN u.id_usuario AS id, u.nombre AS nombre")
-        users = [record for record in users_result]
-
-        profiles_result = session.run("MATCH (p:Perfil) RETURN p.id_perfil AS id, p.nombre AS nombre, p.caracteristicas AS caracteristicas")
-        profiles = [record for record in profiles_result]
-
-        preferences_result = session.run("MATCH (u:Usuario)-[:LE_GUSTA]->(g:Gusto) RETURN u.id_usuario AS user_id, g.nombre AS gusto")
-        preferences = [record for record in preferences_result]
-
-        users_preferences_result = session.run("""
-            MATCH (u:Usuario)-[:TIENE_PREFERENCIA_PRINCIPAL]->(pp:PreferenciaPrincipal)
-            RETURN u.id_usuario AS user_id, u.nombre AS nombre, pp.tipo AS tipo_preferencia, pp.valor AS valor_preferencia
-        """)
-
-        users_preferences = [record for record in users_preferences_result]
-        print("preferencias:", users_preferences)
-        
-    data = {
-        'users': users,
-        'profiles': profiles,
-        'preferences': preferences,
-        'users_preferences': users_preferences
-    }
-    return jsonify(data)
-
 # Ruta para generar un nuevo perfil
 @app.route('/generate_new_profile')
 def generate_new_profile_route():

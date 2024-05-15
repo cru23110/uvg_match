@@ -216,19 +216,18 @@ class GustosCombiner:
 
             # Sumar puntajes
             puntaje_total = GustosCombiner.sumar_puntajes(gustos_totales_uniq)
-            print(puntaje_total)
+            
             # Eliminar campos y guardar en la lista de propiedades
             gustos_totales_uniq = GustosCombiner.eliminar_propiedades(gustos_totales_uniq)
         else:
             # Sumar puntajes
             puntaje_total = GustosCombiner.sumar_puntajes(gustos_usuario_sesion)
-            print(puntaje_total)
 
             # Si no hay usuario similar, solo eliminar campos del usuario en sesión
             gustos_usuario_sesion = GustosCombiner.eliminar_propiedades(gustos_usuario_sesion)
             gustos_totales_uniq = gustos_usuario_sesion
 
-        return gustos_totales_uniq
+        return gustos_totales_uniq, puntaje_total
     
     @staticmethod
     def sumar_puntajes(gustos):
