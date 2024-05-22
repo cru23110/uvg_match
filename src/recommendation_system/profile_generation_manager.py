@@ -1,4 +1,6 @@
+import os
 from flask import json
+import requests
 from src.recommendation_system.preferences_primary import PrimaryPreferences
 from src.recommendation_system.recommendation_algorithm import GustosCombiner
 from db.neo4j_config import neo4j_connection
@@ -23,12 +25,6 @@ def generate_new_profile(user_id):
 
     # Convertir el diccionario de categorías a una cadena JSON
     gustos_json = json.dumps(categorias_gustos)
-
-    # Deserializar la cadena JSON a un diccionario
-    # gustos_dict = json.loads(gustos_json)
-
-    # Imprimir el diccionario para verificar su contenido
-    # print(gustos_dict)
 
     # Obtener solo los IDs de los gustos
     ids_gustos = [gusto['gusto_id'] for gusto in gustos]
@@ -72,7 +68,10 @@ def generate_new_profile(user_id):
     # Guardar el perfil en la base de datos
     save_new_profile(nuevo_perfil, user_id)
 
-    return True
+    # return True
+    # Deserializar el JSON de 'Gustos'
+    nuevo_perfil['Gustos'] = json.loads(nuevo_perfil['Gustos'])
+    return nuevo_perfil
 
 def generate_description(nombre, genero, edad, intereses, tipo_relacion):
     # Construir la descripción basada en las características proporcionadas
@@ -158,3 +157,68 @@ def save_new_profile(nuevo_perfil, user_id):
         )
     return True
 
+# -------Generacion de imagen----------
+def construct_image_prompt(nuevo_perfil):
+    # Construir el prompt para la imagen basado en los datos del nuevo perfil
+    prompt = f"Genera una imagen para {nuevo_perfil['Nombre']}"
+
+    # Género
+    if nuevo_perfil['Genero'] == "Hombre":
+        prompt += " masculina"
+    elif nuevo_perfil['Genero'] == "Mujer":
+        prompt += " femenina"
+    else:
+        prompt += " persona"
+
+    # Edad
+    prompt += f" de {nuevo_perfil['Edad']} años"
+
+    # Altura (opcional)
+    if nuevo_perfil['Altura']:
+        prompt += f" y {nuevo_perfil['Altura']} de altura"
+
+    # Intereses (opcional)
+    if nuevo_perfil['Intereses']:
+        prompt += f", interesada en {', '.join(nuevo_perfil['Intereses'])}"
+
+    # Finalizar el prompt
+    prompt += "."
+    
+    return prompt
+
+def generate_image_filename(user_id, profile_id):
+    # Generar el nombre de archivo para la imagen
+    return f"{user_id}s{profile_id}.png"
+
+def generate_and_save_image(prompt, filename, size="medium"):
+    # Solicitar a Midjourney la generación de la imagen
+    midjourney_url = "URL_DE_MIDJOURNEY_PARA_GENERAR_IMAGEN"  # Reemplaza con la URL real de Midjourney
+    data = {
+        "prompt": prompt,
+        "size": size
+    }
+    response = requests.post(midjourney_url, json=data)
+
+    # Asegurarse de que el directorio de destino existe
+    output_dir = os.path.abspath("./static/img/profile_photo/")
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Guardar la imagen en la ubicación deseada
+    image_path = os.path.join(output_dir, filename)
+    with open(image_path, "wb") as f:
+        f.write(response.content)
+
+    return image_path
+
+def generate_and_save_profile_image(user_id, profile_id, nuevo_perfil):
+    # Construir el prompt para la imagen
+    prompt = construct_image_prompt(nuevo_perfil)
+
+    # Generar el nombre de archivo para la imagen
+    filename = generate_image_filename(user_id, profile_id)
+
+    # Generar y guardar la imagen
+    image_path = generate_and_save_image(prompt, filename)
+
+    # Retornar la ruta completa del archivo de imagen generado
+    return image_path

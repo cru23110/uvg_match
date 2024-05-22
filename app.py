@@ -25,9 +25,36 @@ def index():
     # Obtener el nombre de usuario correspondiente al ID del usuario
     current_user = get_username_by_id(user_id)
     
-    # Renderizar la página principal
-    return render_template('index.html', current_user=current_user)
+    # Obtener los datos del nuevo perfil
+    nuevo_perfil = generate_new_profile(user_id)
+    
+    # Renderizar la página principal con los datos del usuario y del perfil
+    return render_template('index.html', current_user=current_user, nuevo_perfil=nuevo_perfil)
 
+@app.route('/handle_like_dislike', methods=['POST'])
+def handle_like_dislike():
+    data = request.get_json()
+    action = data.get('action')
+    
+    # Obtener el ID del usuario activo
+    user_id = session.get('user_id')
+    if user_id:
+        # Aquí puedes manejar la lógica para "like" y "dislike"
+        if action == 'like':
+            # Lógica para "like"
+            pass
+        elif action == 'dislike':
+            # Lógica para "dislike"
+            pass
+        
+        # Generar un nuevo perfil
+        result = generate_new_profile(user_id)
+        if result:
+            return jsonify(success=True)
+        else:
+            return jsonify(success=False)
+    else:
+        return jsonify(success=False, message="Usuario no autenticado")
 
 @app.route('/pro_version')
 def pro_version():
@@ -36,9 +63,12 @@ def pro_version():
 
     # Obtener el nombre de usuario correspondiente al ID del usuario
     current_user = get_username_by_id(user_id)
+
+    # Obtener los datos del nuevo perfil
+    nuevo_perfil = generate_new_profile(user_id)
     
     # Renderizar la página principal
-    return render_template('pro_version.html', current_user=current_user)
+    return render_template('pro_version.html', current_user=current_user, nuevo_perfil=nuevo_perfil)
 
 # Ruta para generar un nuevo perfil
 @app.route('/generate_new_profile')
@@ -135,32 +165,6 @@ def save_preferences():
     preferences_db.save_preferences(user_id, gender_preference, edad_minima, edad_maxima, distancia_minima, distancia_maxima, 
                                     altura_minima, altura_maxima, religion, other_religion, relationship_status, intereses, 
                                     relationship_type, other_relationship, smoker_preference, drinker_preference, education_level)
-    
-    # Imprimir los datos recibidos
-    # print("id:", user_id)
-    # print("Preferencia de género:", gender_preference)
-    # print("Edad mínima:", edad_minima)
-    # print("Edad máxima:", edad_maxima)
-    # print("Distancia mínima:", distancia_minima)
-    # print("Distancia máxima:", distancia_maxima)
-    # print("Altura mínima:", altura_minima)
-    # print("Altura máxima:", altura_maxima)
-    # print("Religión:", religion)
-    # print("Otra religión especificada:", other_religion)
-    # print("Estado civil:", relationship_status)
-    # print("Deportes:", deportes)
-    # print("Música:", musica)
-    # print("Películas:", peliculas)
-    # print("Pasatiempos:", pasatiempos)
-    # print("Tecnología:", tecnologia)
-    # print("Cultura:", cultura)
-    # print("Estilo de vida:", estilo_vida)
-    # print("Intereses:", intereses)
-    # print("Tipo de relación buscada:", relationship_type)
-    # print("Otro tipo de relación especificado:", other_relationship)
-    # print("Fumador:", smoker_preference)
-    # print("Bebedor:", drinker_preference)
-    # print("Nivel educativo:", education_level)
     
     # Redirigir al usuario a la página de inicio de sesión después de guardar las preferencias
     return redirect(url_for('login'))
