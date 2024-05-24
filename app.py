@@ -1,6 +1,7 @@
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from src.recommendation_system.profile_generation_manager import generate_new_profile
-from src.authentication import authenticate_user, get_user_id, get_username_by_id, obtener_ultimo_user_id, register_user
+from src.recommendation_system.recommendation_algorithm import *
+from src.authentication import authenticate_user, get_user_id, get_username_by_id, obtener_nuevo_gusto_id, obtener_ultimo_user_id, register_user, save_gusto
 from db.neo4j_config import neo4j_connection
 from src.preferences import PreferencesDB
 
@@ -165,6 +166,25 @@ def save_preferences():
     preferences_db.save_preferences(user_id, gender_preference, edad_minima, edad_maxima, distancia_minima, distancia_maxima, 
                                     altura_minima, altura_maxima, religion, other_religion, relationship_status, intereses, 
                                     relationship_type, other_relationship, smoker_preference, drinker_preference, education_level)
+    
+    # Encontrar usuario más similar
+    id_usuario_similar = SimilarUserFinder().find_similar_user(user_id)
+
+    if id_usuario_similar:
+        # Ejecutar técnicas de selección para el usuario más similar y obtener 15 gustos secundarios
+        gustos_usuario_similar = UserLikesProcessor().ejecutar_tecnicas_de_seleccion(id_usuario_similar, 15)
+        
+        # Obtener el gusto_id más alto y empezar desde ahí
+        nuevo_gusto_id = obtener_nuevo_gusto_id()  
+
+        # Asignar nuevos gustos al nuevo usuario
+        for gusto in gustos_usuario_similar:
+            gusto['gusto_id'] = nuevo_gusto_id
+            gusto['user_id'] = user_id
+            gusto['veces_utilizado'] = 0
+            gusto['likes'] = 0
+            save_gusto(gusto)  # Implementa esta función para guardar el gusto en Neo4j
+            nuevo_gusto_id += 1  # Incrementar el gusto_id para el siguiente gusto
     
     # Redirigir al usuario a la página de inicio de sesión después de guardar las preferencias
     return redirect(url_for('login'))

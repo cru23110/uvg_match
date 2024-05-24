@@ -1,6 +1,9 @@
 import os
 from flask import json
 import requests
+
+# import torch
+# from diffusers import StableDiffusionPipeline
 from src.recommendation_system.preferences_primary import PrimaryPreferences
 from src.recommendation_system.recommendation_algorithm import GustosCombiner
 from db.neo4j_config import neo4j_connection
@@ -62,8 +65,13 @@ def generate_new_profile(user_id):
         'Gustos': gustos_json,
         'IDs de gustos': ids_gustos,
         'Puntuacion del perfil': puntuacion_perfil,
-        'Path de la imagen': '/path/to/image'  # Reemplaza con el path real
+        'Path de la imagen': ''
     }
+
+    # Generar y guardar la imagen del perfil
+    # image_path = generate_and_save_profile_image(user_id, new_profile_id, nuevo_perfil)
+    # nuevo_perfil['Path de la imagen'] = image_path
+    
     print(nuevo_perfil)
     # Guardar el perfil en la base de datos
     save_new_profile(nuevo_perfil, user_id)
@@ -190,35 +198,38 @@ def generate_image_filename(user_id, profile_id):
     # Generar el nombre de archivo para la imagen
     return f"{user_id}s{profile_id}.png"
 
-def generate_and_save_image(prompt, filename, size="medium"):
-    # Solicitar a Midjourney la generación de la imagen
-    midjourney_url = "URL_DE_MIDJOURNEY_PARA_GENERAR_IMAGEN"  # Reemplaza con la URL real de Midjourney
-    data = {
-        "prompt": prompt,
-        "size": size
-    }
-    response = requests.post(midjourney_url, json=data)
+# def generate_and_save_image(prompt, filename):            #Esta comentado pues aun no se usara, usa demasiados recursos de la computadora que lo este corriendo, asi que aun no esta lista esta funcionalidad
+#     # Configurar el modelo
+#     model_id = "CompVis/stable-diffusion-v1-4"
+#     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # Asegurarse de que el directorio de destino existe
-    output_dir = os.path.abspath("./static/img/profile_photo/")
-    os.makedirs(output_dir, exist_ok=True)
+#     # Cargar el pipeline de Stable Diffusion
+#     pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+#     pipe = pipe.to(device)
+#     pipe.enable_attention_slicing()
 
-    # Guardar la imagen en la ubicación deseada
-    image_path = os.path.join(output_dir, filename)
-    with open(image_path, "wb") as f:
-        f.write(response.content)
+#     # Generar la imagen
+#     image = pipe(prompt).images[0]
 
-    return image_path
+#     # Asegurarse de que el directorio de destino existe
+#     output_dir = os.path.abspath("./static/img/profile_photo/")
+#     os.makedirs(output_dir, exist_ok=True)
 
-def generate_and_save_profile_image(user_id, profile_id, nuevo_perfil):
-    # Construir el prompt para la imagen
-    prompt = construct_image_prompt(nuevo_perfil)
+#     # Guardar la imagen en la ubicación deseada
+#     image_path = os.path.join(output_dir, filename)
+#     image.save(image_path)
 
-    # Generar el nombre de archivo para la imagen
-    filename = generate_image_filename(user_id, profile_id)
+#     return image_path
 
-    # Generar y guardar la imagen
-    image_path = generate_and_save_image(prompt, filename)
+# def generate_and_save_profile_image(user_id, profile_id, nuevo_perfil):
+#     # Construir el prompt para la imagen
+#     prompt = construct_image_prompt(nuevo_perfil)
 
-    # Retornar la ruta completa del archivo de imagen generado
-    return image_path
+#     # Generar el nombre de archivo para la imagen
+#     filename = generate_image_filename(user_id, profile_id)
+
+#     # Generar y guardar la imagen
+#     image_path = generate_and_save_image(prompt, filename)
+
+#     # Retornar la ruta completa del archivo de imagen generado
+#     return image_path

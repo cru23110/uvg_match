@@ -33,8 +33,13 @@ class UserLikesProcessor:
 
     def calcular_puntaje(self, gusto, max_likes):
         # Normalización de datos
-        likes_normalizado = gusto['likes'] / max_likes
-        veces_utilizado_normalizado = gusto['veces_utilizado'] / max_likes
+        if max_likes == 0:
+            likes_normalizado = 0
+            veces_utilizado_normalizado = 0
+        else:
+            # Normalización de datos
+            likes_normalizado = gusto['likes'] / max_likes
+            veces_utilizado_normalizado = gusto['veces_utilizado'] / max_likes
         
         # Asignación de pesos
         peso_likes = 0.7
@@ -72,7 +77,10 @@ class UserLikesProcessor:
         # Calcular las probabilidades de selección basadas en los puntajes
         puntajes = [gusto['puntaje'] for gusto in gustos]
         total_puntajes = sum(puntajes)
-        probabilidades = [puntaje / total_puntajes for puntaje in puntajes]
+        if total_puntajes == 0:
+            probabilidades = [1 / len(gustos) for _ in gustos]
+        else:
+            probabilidades = [puntaje / total_puntajes for puntaje in puntajes]
 
         # Realizar muestreo aleatorio ponderado
         seleccionados = random.choices(gustos, weights=probabilidades, k=cantidad_gustos)
@@ -136,11 +144,11 @@ class UserLikesProcessor:
         # print(seleccionados_ponderados)
 
         # print("\nSelección basada en cuartiles:")
-        seleccionados_cuartiles = self.seleccionar_gustos_cuartiles(gustos_ordenados, cantidad_gustos)
+        # seleccionados_cuartiles = self.seleccionar_gustos_cuartiles(gustos_ordenados, cantidad_gustos)
         # print(seleccionados_cuartiles)
 
         # print("\nTécnica ε-greedy:")
-        seleccionados_epsilon_greedy = self.seleccionar_gustos_epsilon_greedy(gustos_ordenados, cantidad_gustos)
+        # seleccionados_epsilon_greedy = self.seleccionar_gustos_epsilon_greedy(gustos_ordenados, cantidad_gustos)
         # print(seleccionados_epsilon_greedy)
 
         return(seleccionados_ponderados)

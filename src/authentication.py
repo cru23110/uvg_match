@@ -64,3 +64,32 @@ def obtener_ultimo_user_id():
             return record['user_id']
         else:
             return None
+        
+def obtener_nuevo_gusto_id():
+    with neo4j_connection.get_session() as session:
+        result = session.run("MATCH (g:Gusto) RETURN MAX(g.gusto_id) AS max_id")
+        record = result.single()
+        max_id = record['max_id'] if record['max_id'] else 0
+        return max_id + 1
+        
+def save_gusto(gusto):
+    with neo4j_connection.get_session() as session:
+        session.run(
+            """
+            CREATE (g:Gusto {gusto_id: $gusto_id, user_id: $user_id, nombre: $nombre, clase: $clase, veces_utilizado: $veces_utilizado, likes: $likes})
+            """,
+            gusto_id=gusto['gusto_id'],
+            user_id=gusto['user_id'],
+            nombre=gusto['nombre'],
+            clase=gusto['clase'],
+            veces_utilizado=gusto['veces_utilizado'],
+            likes=gusto['likes']
+        )
+        session.run(
+            """
+            MATCH (u:Usuario {id_usuario: $user_id}), (g:Gusto {gusto_id: $gusto_id})
+            CREATE (u)-[:TIENE_GUSTO]->(g)
+            """,
+            user_id=gusto['user_id'],
+            gusto_id=gusto['gusto_id']
+        )
