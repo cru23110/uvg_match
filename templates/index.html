@@ -24,7 +24,7 @@
     <header class="header">
         <div class="logo-container">
             <a href="/" class="logo-link">
-                <img src="../static/img/uvg_match.png" alt="Logo">
+                <img src="../static/img/uvg_match2.png" alt="Logo">
             </a>
         </div>
         <div class="pro-container">
@@ -47,18 +47,24 @@
     <!-- ------- Cards ------- -->
     <div class="card-container">
         <div class="tinder-card">
-            <h2>{{ nuevo_perfil['Nombre'] }}</h2>
-            <p><b>Descripción:</b>{{ nuevo_perfil['Descripcion'] }}</p>
-            <p><b>Edad:</b>{{ nuevo_perfil['Edad'] }}</p>
-            <p><b>Género:</b>{{ nuevo_perfil['Genero'] }}</p>
-            <p><b>Altura:</b>{{ nuevo_perfil['Altura'] }} cm</p>
-            <p><b>Distancia:</b>{{ nuevo_perfil['Distancia'] }} km</p>
-            <p><b>Religión:</b>{{ nuevo_perfil['Religion'] }}</p>
-            <p><b>Tipo de relación:</b>{{ nuevo_perfil['Tipo de relacion que busca'] }}</p>
-            <p><b>Estado civil:</b>{{ nuevo_perfil['Estado civil'] }}</p>
-            <p><b>Preferencia de fumador:</b>{{ nuevo_perfil['Preferencia de fumador'] }}</p>
-            <p><b>Preferencia de bebedor:</b>{{ nuevo_perfil['Preferencia de bebedor'] }}</p>
-            <p><b>Nivel educativo:</b> {{ nuevo_perfil['Nivel educativo'] }}</p>
+            <h2 class="new-profile-name">{{ nuevo_perfil['Nombre'] }}</h2>
+            <p class="description"><b>Descripción:</b>{{ nuevo_perfil['Descripcion'] }}</p>
+            <div class="profile-content">
+                <div class="left-column">
+                    <p><b>Edad:</b>{{ nuevo_perfil['Edad'] }}</p>
+                    <p><b>Género:</b>{{ nuevo_perfil['Genero'] }}</p>
+                    <p><b>Altura:</b>{{ nuevo_perfil['Altura'] }} cm</p>
+                    <p><b>Distancia:</b>{{ nuevo_perfil['Distancia'] }} km</p>
+                    <p><b>Religión:</b>{{ nuevo_perfil['Religion'] }}</p>
+                </div>
+                <div class="right-column">
+                    <p><b>Tipo de relación:</b>{{ nuevo_perfil['Tipo de relacion que busca'] }}</p>
+                    <p><b>Estado civil:</b>{{ nuevo_perfil['Estado civil'] }}</p>
+                    <p><b>Preferencia de fumador:</b>{{ nuevo_perfil['Preferencia de fumador'] }}</p>
+                    <p><b>Preferencia de bebedor:</b>{{ nuevo_perfil['Preferencia de bebedor'] }}</p>
+                    <p><b>Nivel educativo:</b> {{ nuevo_perfil['Nivel educativo'] }}</p>
+                </div>
+            </div>
             <p><b>Gustos:</b></p>
             <ul>
                 {% for categoria, items in nuevo_perfil['Gustos'].items() %}
@@ -72,8 +78,10 @@
                     </li>
                 {% endfor %}
             </ul>
-            <button class="like-btn" onclick="handleLikeDislike('like')">Like</button>
-            <button class="dislike-btn" onclick="handleLikeDislike('dislike')">Dislike</button>
+            <div class="button-container">
+                <button class="like-btn" onclick="handleLikeDislike('like')">Like</button>
+                <button class="dislike-btn" onclick="handleLikeDislike('dislike')">Dislike</button>
+            </div>
         </div>
     </div>
 
