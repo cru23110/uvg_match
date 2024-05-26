@@ -13,14 +13,16 @@ html, body {
     flex: 1;
 }
 
+
 .login-page{
-    background-image: url('../img/background_login.png');
-    background-size: cover;
+    background-image: url('../img/background_login2.png');
+    background-size: auto 100%;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-position: center;
+    background-position: right;
     background-color: #FFFFFF;
     margin: 0;
+    
 }
 
 .login-container {
