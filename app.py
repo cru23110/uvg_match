@@ -2,8 +2,8 @@ from flask import Flask, flash, jsonify, redirect, render_template, request, ses
 from src.recommendation_system.profile_generation_manager import generate_new_profile
 from src.recommendation_system.recommendation_algorithm import *
 from src.authentication import authenticate_user, get_user_id, get_username_by_id, obtener_nuevo_gusto_id, obtener_ultimo_user_id, register_user, save_gusto
-from db.neo4j_config import neo4j_connection
 from src.preferences import PreferencesDB
+from src.like_dislike_handler import like_dislike_handler
 
 app = Flask(__name__)
 
@@ -40,18 +40,15 @@ def handle_like_dislike():
     # Obtener el ID del usuario activo
     user_id = session.get('user_id')
     if user_id:
-        # Aquí puedes manejar la lógica para "like" y "dislike"
+        success = False
         if action == 'like':
-            # Lógica para "like"
-            pass
+            success = like_dislike_handler.handle_like(user_id)
         elif action == 'dislike':
-            # Lógica para "dislike"
-            pass
+            success = like_dislike_handler.handle_dislike(user_id)
         
-        # Generar un nuevo perfil
-        result = generate_new_profile(user_id)
-        if result:
-            return jsonify(success=True)
+        # Redirigir a la página principal
+        if success:
+            return jsonify(success=True, redirect_url=url_for('index'))
         else:
             return jsonify(success=False)
     else:

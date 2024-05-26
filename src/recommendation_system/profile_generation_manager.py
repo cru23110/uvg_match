@@ -1,9 +1,6 @@
 import os
 from flask import json
 import requests
-
-# import torch
-# from diffusers import StableDiffusionPipeline
 from src.recommendation_system.preferences_primary import PrimaryPreferences
 from src.recommendation_system.recommendation_algorithm import GustosCombiner
 from db.neo4j_config import neo4j_connection
@@ -71,10 +68,12 @@ def generate_new_profile(user_id):
     # Generar y guardar la imagen del perfil
     # image_path = generate_and_save_profile_image(user_id, new_profile_id, nuevo_perfil)
     # nuevo_perfil['Path de la imagen'] = image_path
-    
     print(nuevo_perfil)
     # Guardar el perfil en la base de datos
     save_new_profile(nuevo_perfil, user_id)
+
+    # Incrementar el contador de veces utilizado para cada gusto
+    increment_gusto_usage(ids_gustos, user_id)
 
     # return True
     # Deserializar el JSON de 'Gustos'
@@ -164,6 +163,18 @@ def save_new_profile(nuevo_perfil, user_id):
             Path_de_la_imagen=nuevo_perfil['Path de la imagen']
         )
     return True
+
+def increment_gusto_usage(ids_gustos, user_id):
+    # Incrementar el contador de veces utilizado para cada gusto
+    with neo4j_connection.get_session() as session:
+        for gusto_id in ids_gustos:
+            session.run(
+                """
+                MATCH (g:Gusto {gusto_id: $gusto_id})
+                SET g.veces_utilizado = COALESCE(g.veces_utilizado, 0) + 1
+                """,
+                gusto_id=gusto_id
+            )
 
 # -------Generacion de imagen----------
 def construct_image_prompt(nuevo_perfil):
