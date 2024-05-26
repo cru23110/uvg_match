@@ -1,4 +1,37 @@
 /* Estilos para el formulario */
+.interests-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.interests-container div {
+    display: flex;
+    flex-direction: column;
+}
+
+.interests-container label {
+    margin-bottom: 10px;
+}
+
+select[multiple] {
+    height: auto;
+    min-height: 100px;
+}
+
+.card-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.8;
+}
+
 form {
     max-width: 600px;
     margin: 0 auto;
@@ -23,9 +56,24 @@ select[multiple] {
     height: auto;
 }
 
+.lb-rel{
+    margin-top: 20px;
+}
+
+.menu-despl{
+    margin-top: 10px;
+}
+
+.cont-btn{
+    display: flex;
+    justify-content: center; /* Centra los botones horizontalmente */
+    gap: 10px; /* Espacio entre los botones */
+    margin-top: 20px;
+}
+
 /* Estilos para el botón de enviar */
 button[type="submit"] {
-    background-color: #007bff;
+    background-color: #8C2641;
     color: #fff;
     padding: 10px 20px;
     border: none;
@@ -34,5 +82,5 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-    background-color: #0056b3;
+    background-color: #EF8CAA;
 }
