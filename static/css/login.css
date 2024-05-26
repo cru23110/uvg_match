@@ -1,3 +1,17 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.content-wrap {
+    flex: 1;
+}
 
 .login-container {
     width: 300px;
@@ -6,6 +20,7 @@
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    
 }
 
 .form-group {
@@ -18,22 +33,39 @@ label {
 
 input[type="text"],
 input[type="password"] {
-    width: 100%;
+    width: 94%;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 3px;
+    margin-top: 10px;
+    margin-bottom: 5px;
 }
 
 button {
     width: 100%;
     padding: 10px;
-    background-color: #007bff;
+    justify-content: center; 
+    background-color: #8C2641;
     color: #fff;
     border: none;
-    border-radius: 3px;
+    border-radius: 5px; 
+    display: inline-block; 
+    text-align: center; 
     cursor: pointer;
+    display: flex;
+    justify-content: center; /* Centra los botones horizontalmente */
+    gap: 10px; /* Espacio entre los botones */
+    margin-top: 10px; /* Añade margen superior si es necesario */
+    
 }
 
+
 button:hover {
-    background-color: #0056b3;
+    background-color: #EF8CAA;
+}
+
+.text-register{
+    margin-top: 20px;
+    margin-bottom: 5px;
+    text-align: center;
 }
