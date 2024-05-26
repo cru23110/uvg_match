@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UVG_Match</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+        integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://kit.fontawesome.com/1bcb8b5e39.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/1bcb8b5e39.js" crossorigin="anonymous"></script>
     <!-- CSS de Bootstrap -->
@@ -16,16 +19,17 @@
     <!-- JavaScript de Bootstrap -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    
+
     <link rel="stylesheet" href="../static/css/style.css">
     <link rel="stylesheet" href="../static/css/app.css">
 </head>
+
 <body>
     <!-- ------- Header ------- -->
     <header class="header">
         <div class="logo-container">
             <a href="/" class="logo-link">
-                <img src="../static/img/uvg_match.png" alt="Logo">
+                <img src="../static/img/UVG_match2.png" alt="Logo">
             </a>
         </div>
         <div class="user-icon-container">
@@ -33,9 +37,9 @@
                 <i class="fa-regular fa-circle-user"></i>
             </a>
             {% if current_user %}
-                <form action="/logout" method="post">
-                    <button type="submit" class="btn btn-link">Cerrar sesión</button>
-                </form>
+            <form action="/logout" method="post">
+                <button type="submit" class="btn btn-link">Cerrar sesión</button>
+            </form>
             {% endif %}
         </div>
     </header>
@@ -44,33 +48,41 @@
     <div class="card-container">
         <div class="tinder-card">
             <img src="{{ nuevo_perfil['Path_de_la_imagen'] }}" alt="Profile Picture">
-            <h2>{{ nuevo_perfil['Nombre'] }}</h2>
-            <p><b>Descripción:</b>{{ nuevo_perfil['Descripcion'] }}</p>
-            <p><b>Edad:</b>{{ nuevo_perfil['Edad'] }}</p>
-            <p><b>Género:</b>{{ nuevo_perfil['Genero'] }}</p>
-            <p><b>Altura:</b>{{ nuevo_perfil['Altura'] }} cm</p>
-            <p><b>Distancia:</b>{{ nuevo_perfil['Distancia'] }} km</p>
-            <p><b>Religión:</b>{{ nuevo_perfil['Religion'] }}</p>
-            <p><b>Tipo de relación:</b>{{ nuevo_perfil['Tipo de relacion que busca'] }}</p>
-            <p><b>Estado civil:</b>{{ nuevo_perfil['Estado civil'] }}</p>
-            <p><b>Preferencia de fumador:</b>{{ nuevo_perfil['Preferencia de fumador'] }}</p>
-            <p><b>Preferencia de bebedor:</b>{{ nuevo_perfil['Preferencia de bebedor'] }}</p>
-            <p><b>Nivel educativo:</b> {{ nuevo_perfil['Nivel educativo'] }}</p>
+            <h2 class="new-profile-name">{{ nuevo_perfil['Nombre'] }}</h2>
+            <p class="description"><b>Descripción:</b>{{ nuevo_perfil['Descripcion'] }}</p>
+            <div class="profile-content">
+                <div class="left-column">
+                    <p><b>Edad:</b>{{ nuevo_perfil['Edad'] }}</p>
+                    <p><b>Género:</b>{{ nuevo_perfil['Genero'] }}</p>
+                    <p><b>Altura:</b>{{ nuevo_perfil['Altura'] }} cm</p>
+                    <p><b>Distancia:</b>{{ nuevo_perfil['Distancia'] }} km</p>
+                    <p><b>Religión:</b>{{ nuevo_perfil['Religion'] }}</p>
+                </div>
+                <div class="right-column">
+                    <p><b>Tipo de relación:</b>{{ nuevo_perfil['Tipo de relacion que busca'] }}</p>
+                    <p><b>Estado civil:</b>{{ nuevo_perfil['Estado civil'] }}</p>
+                    <p><b>Preferencia de fumador:</b>{{ nuevo_perfil['Preferencia de fumador'] }}</p>
+                    <p><b>Preferencia de bebedor:</b>{{ nuevo_perfil['Preferencia de bebedor'] }}</p>
+                    <p><b>Nivel educativo:</b> {{ nuevo_perfil['Nivel educativo'] }}</p>
+                </div>
+            </div>
             <p><b>Gustos:</b></p>
             <ul>
                 {% for categoria, items in nuevo_perfil['Gustos'].items() %}
-                    <li>
-                        <strong>{{ categoria }}</strong>:
-                        <ul>
-                            {% for gusto in items %}
-                                <li>{{ gusto }}</li>
-                            {% endfor %}
-                        </ul>
-                    </li>
+                <li>
+                    <strong>{{ categoria }}</strong>:
+                    <ul>
+                        {% for gusto in items %}
+                        <li>{{ gusto }}</li>
+                        {% endfor %}
+                    </ul>
+                </li>
                 {% endfor %}
             </ul>
-            <button class="like-btn" onclick="handleLikeDislike('like')">Like</button>
-            <button class="dislike-btn" onclick="handleLikeDislike('dislike')">Dislike</button>
+            <div class="button-container">
+                <button class="like-btn" onclick="handleLikeDislike('like')">Like</button>
+                <button class="dislike-btn" onclick="handleLikeDislike('dislike')">Dislike</button>
+            </div>
         </div>
     </div>
 
@@ -86,4 +98,5 @@
     <script src="./static/js/handleLikeDislike.js"></script>
 
 </body>
+
 </html>
