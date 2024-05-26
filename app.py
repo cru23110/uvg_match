@@ -1,6 +1,16 @@
-from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
+"""
+Aplicación Flask para Sistema de Recomendaciones
+
+Esta aplicación Flask proporciona una interfaz de usuario para un sistema de recomendaciones,
+permitiendo a los usuarios generar nuevos perfiles, dar like o dislike a recomendaciones, guardar preferencias,
+y registrar/iniciar sesión/cerrar sesión.
+
+Autores: [Juan Cruz, Nadissa Vela, Lingna Chen]
+"""
+
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 from src.recommendation_system.profile_generation_manager import generate_new_profile
-from src.recommendation_system.recommendation_algorithm import *
+from src.recommendation_system.recommendation_algorithm import SimilarUserFinder, UserLikesProcessor
 from src.authentication import authenticate_user, get_user_id, get_username_by_id, obtener_nuevo_gusto_id, obtener_ultimo_user_id, register_user, save_gusto
 from src.preferences import PreferencesDB
 from src.like_dislike_handler import like_dislike_handler
@@ -9,35 +19,29 @@ app = Flask(__name__)
 
 app.secret_key = 'HjbRlkNgrFNkmws'
 
-# Crear una instancia del manejo de preferencias de usuario
+# Crear una instancia de manejo de preferencias de usuario
 preferences_db = PreferencesDB()
 
 # Ruta para la página principal
 @app.route('/')
 def index():
-    # Verificar si el usuario está logueado
+    """Ruta principal para la página de inicio."""
     if 'user_id' not in session:
-        # Si no hay un usuario logueado, redirigir a la página de inicio de sesión
         return redirect(url_for('login'))
-    
-    # Obtener el ID del usuario activo en la sesión
-    user_id = session.get('user_id')
 
-    # Obtener el nombre de usuario correspondiente al ID del usuario
+    user_id = session.get('user_id')
     current_user = get_username_by_id(user_id)
-    
-    # Obtener los datos del nuevo perfil
     nuevo_perfil = generate_new_profile(user_id)
-    
-    # Renderizar la página principal con los datos del usuario y del perfil
+
     return render_template('index.html', current_user=current_user, nuevo_perfil=nuevo_perfil)
 
+# Ruta para manejar acciones de like/dislike
 @app.route('/handle_like_dislike', methods=['POST'])
 def handle_like_dislike():
+    """Maneja las acciones de like/dislike."""
     data = request.get_json()
     action = data.get('action')
     
-    # Obtener el ID del usuario activo
     user_id = session.get('user_id')
     if user_id:
         success = False
@@ -46,7 +50,6 @@ def handle_like_dislike():
         elif action == 'dislike':
             success = like_dislike_handler.handle_dislike(user_id)
         
-        # Redirigir a la página principal
         if success:
             return jsonify(success=True, redirect_url=url_for('index'))
         else:
@@ -54,27 +57,22 @@ def handle_like_dislike():
     else:
         return jsonify(success=False, message="Usuario no autenticado")
 
+# Ruta para la versión Pro (pro_version.html)
 @app.route('/pro_version')
 def pro_version():
-    # Obtener el ID del usuario activo en la sesión
+    """Ruta para la versión Pro de la aplicación."""
     user_id = session.get('user_id')
-
-    # Obtener el nombre de usuario correspondiente al ID del usuario
     current_user = get_username_by_id(user_id)
-
-    # Obtener los datos del nuevo perfil
     nuevo_perfil = generate_new_profile(user_id)
     
-    # Renderizar la página principal
     return render_template('pro_version.html', current_user=current_user, nuevo_perfil=nuevo_perfil)
 
 # Ruta para generar un nuevo perfil
 @app.route('/generate_new_profile')
 def generate_new_profile_route():
-    # Obtener el ID del usuario activo
+    """Ruta para generar un nuevo perfil de usuario."""
     user_id = session.get('user_id')
     if user_id:
-        # Llamar a la función para generar el nuevo perfil
         result = generate_new_profile(user_id)
         if result:
             return "Nuevo perfil generado exitosamente"
@@ -83,56 +81,49 @@ def generate_new_profile_route():
     else:
         return "Usuario no autenticado"
 
-# Función para la página de inicio de sesión
+# Ruta para la página de inicio de sesión
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Ruta para la página de inicio de sesión."""
     if request.method == 'POST':
-        # Obtener las credenciales del formulario de inicio de sesión
         username = request.form['username']
         password = request.form['password']
         
-        # Verificar las credenciales con la función de autenticación
         if authenticate_user(username, password):
-            # Si las credenciales son válidas, establecer la sesión del usuario con su ID y redirigirlo a la página principal
             user_id = get_user_id(username, password)
             session['user_id'] = user_id
             return redirect(url_for('index'))
 
-    # Si el método es GET o las credenciales son incorrectas, renderizar la página de inicio de sesión
     return render_template('login.html')
 
 # Ruta para la página de registro de usuarios
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """Ruta para la página de registro de usuarios."""
     if request.method == 'POST':
-        # Obtener las credenciales del formulario de registro
         username = request.form['username']
         password = request.form['password']
         
-        # Verificar si tanto el nombre de usuario como la contraseña no están vacíos
         if not username.strip() or not password.strip():
-            # Redirigir al usuario nuevamente a la página de registro
             return redirect(url_for('register'))
         
-        # Registrar al nuevo usuario en la base de datos
         register_user(username, password)
         
-        # Redirigir al usuario a la página de preferencias después de registrarse
         return redirect(url_for('preferences'))
     
-    # Renderizar la página de registro de usuarios
     return render_template('register.html')
 
+# Ruta para la página de preferencias de usuario
 @app.route('/preferences', methods=['GET', 'POST'])
 def preferences():
+    """Ruta para la página de preferencias de usuario."""
     return render_template('preferences_form.html')
 
 # Ruta para guardar las preferencias del usuario
 @app.route('/save_preferences', methods=['POST'])
 def save_preferences():
-    
+    """Ruta para guardar las preferencias del usuario."""
     user_id = obtener_ultimo_user_id()
-    # Recuperar los datos del formulario
     gender_preference = request.form.get('gender_preference')
     edad_minima = request.form.get('edad_minima')
     edad_maxima = request.form.get('edad_maxima')
@@ -156,43 +147,35 @@ def save_preferences():
     drinker_preference = request.form.get('drinker_preference')
     education_level = request.form.get('education_level')
 
-    # Combinar todas las listas de intereses en una sola lista
     intereses = deportes + musica + peliculas + pasatiempos + tecnologia + cultura + estilo_vida
     
-    # Guardar las preferencias en la base de datos
     preferences_db.save_preferences(user_id, gender_preference, edad_minima, edad_maxima, distancia_minima, distancia_maxima, 
                                     altura_minima, altura_maxima, religion, other_religion, relationship_status, intereses, 
                                     relationship_type, other_relationship, smoker_preference, drinker_preference, education_level)
     
-    # Encontrar usuario más similar
     id_usuario_similar = SimilarUserFinder().find_similar_user(user_id)
 
     if id_usuario_similar:
-        # Ejecutar técnicas de selección para el usuario más similar y obtener 15 gustos secundarios
         gustos_usuario_similar = UserLikesProcessor().ejecutar_tecnicas_de_seleccion(id_usuario_similar, 15)
         
-        # Obtener el gusto_id más alto y empezar desde ahí
         nuevo_gusto_id = obtener_nuevo_gusto_id()  
 
-        # Asignar nuevos gustos al nuevo usuario
         for gusto in gustos_usuario_similar:
             gusto['gusto_id'] = nuevo_gusto_id
             gusto['user_id'] = user_id
             gusto['veces_utilizado'] = 0
             gusto['likes'] = 0
-            save_gusto(gusto)  # Implementa esta función para guardar el gusto en Neo4j
-            nuevo_gusto_id += 1  # Incrementar el gusto_id para el siguiente gusto
+            save_gusto(gusto)
+            nuevo_gusto_id += 1
     
-    # Redirigir al usuario a la página de inicio de sesión después de guardar las preferencias
     return redirect(url_for('login'))
 
 # Ruta para cerrar sesión
 @app.route('/logout', methods=['POST'])
 def logout():
-    # Eliminar la sesión del usuario al cerrar sesión
+    """Ruta para cerrar sesión."""
     session.pop('user_id', None)
     return redirect(url_for('login'))
-
 
 if __name__ == '__main__':
     app.run(debug=True)

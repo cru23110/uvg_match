@@ -1,6 +1,4 @@
-import os
 from flask import json
-import requests
 from src.recommendation_system.preferences_primary import PrimaryPreferences
 from src.recommendation_system.recommendation_algorithm import GustosCombiner
 from db.neo4j_config import neo4j_connection
@@ -68,14 +66,13 @@ def generate_new_profile(user_id):
     # Generar y guardar la imagen del perfil
     # image_path = generate_and_save_profile_image(user_id, new_profile_id, nuevo_perfil)
     # nuevo_perfil['Path de la imagen'] = image_path
-    print(nuevo_perfil)
+
     # Guardar el perfil en la base de datos
     save_new_profile(nuevo_perfil, user_id)
 
     # Incrementar el contador de veces utilizado para cada gusto
     increment_gusto_usage(ids_gustos, user_id)
 
-    # return True
     # Deserializar el JSON de 'Gustos'
     nuevo_perfil['Gustos'] = json.loads(nuevo_perfil['Gustos'])
     return nuevo_perfil

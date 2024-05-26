@@ -10,7 +10,6 @@ class LikeDislikeHandler:
 
         # Obtener gustos secundarios del último perfil generado
         gustos_secundarios = last_profile['IDs_de_gustos']
-        print(gustos_secundarios)
 
         # Sumar uno al contador de likes de los gustos secundarios del usuario
         with neo4j_connection.get_session() as session:
