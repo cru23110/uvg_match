@@ -2,14 +2,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
-}
-
-.card-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     margin-top: 20px;
+    width: 100%;
+    max-width: 1200px; /* tamaño máximo del contenedor */
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.8;
 }
 
 .tinder-card {
@@ -17,8 +15,10 @@
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    text-align: left;
-    width: 300px;
+    text-align: center; /* Centra todo el texto dentro de la tarjeta */
+    width: 700px; /* Ajusta el ancho de las tarjetas */
+    margin: 10px; /* Espacio entre tarjetas */
+    position: relative; /* Asegura que esté por encima del pseudo-elemento */
 }
 
 .tinder-card button{
@@ -32,20 +32,52 @@
     margin-bottom: 10px;
 }
 
+/* Contenido del perfil */
+.profile-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start; /* Alinea las columnas al inicio verticalmente */
+    text-align: left;
+    margin-bottom: 30px; /* Añade espacio entre las columnas y los botones */
+}
+
+.left-column, .right-column {
+    width: 48%; /* Cada columna ocupa el 48% del ancho, dejando un 4% de espacio entre ellas */
+}
+
+.new-profile-name {
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 30px;
+}
+
+.description {
+    margin-bottom: 30px;
+}
+
 .like-btn, .dislike-btn {
-    background-color: #ff6b6b;
+    background-color: #8C2641;
     border: none;
     color: #fff;
     cursor: pointer;
     font-size: 16px;
     margin-top: 10px;
+    margin-bottom: 10px;
     padding: 10px 20px;
     border-radius: 5px;
     outline: none;
 }
 
+.button-container {
+    display: flex;
+    justify-content: center; /* Centra los botones horizontalmente */
+    gap: 10px; /* Espacio entre los botones */
+    margin-top: 10px; /* Añade margen superior si es necesario */
+}
+
 .like-btn:hover, .dislike-btn:hover {
-    background-color: #ff5252;
+    background-color: #EF8CAA;
 }
 
 /* Media queries for responsiveness */
@@ -53,5 +85,14 @@
 @media only screen and (max-width: 600px) {
     .tinder-card {
         width: 90%;
+    }
+
+    .profile-content {
+        flex-direction: column; /* Cambia a una columna en pantallas pequeñas */
+        align-items: center; /* Centra las columnas en pantallas pequeñas */
+    }
+
+    .left-column, .right-column {
+        width: 100%; /* Cada columna ocupa el 100% del ancho en pantallas pequeñas */
     }
 }
