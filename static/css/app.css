@@ -37,9 +37,8 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: flex-start; /* Alinea las columnas al inicio verticalmente */
-    text-align: left;
-    margin-bottom: 30px; /* Añade espacio entre las columnas y los botones */
+    align-items: flex-start; 
+    margin-bottom: 30px; 
 }
 
 .left-column, .right-column {
