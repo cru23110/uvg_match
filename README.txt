@@ -22,3 +22,30 @@ To use this project, you need to have Python 3.12.3 installed on your computer, 
    ```bash
    git clone https://github.com/yourusername/uvg_match.git
    cd uvg_match
+
+3. **Install the Required Dependencies**
+
+   Install the necessary libraries using pip:
+
+   pip install Flask==2.3.3 requests==2.31.0 neo4j==5.11.0
+
+##Dependencies
+   Python 3.12.3
+   Flask 2.3.3
+   Requests 2.31.0
+   Neo4J 5.11.0
+
+
+##Project Structure
+   app.py: The main application file where the Flask app is created and configured.
+   templates/: Directory containing HTML templates.
+   static/: Directory containing static files like CSS and JavaScript.
+   src/: Directory containing the source code for the recommendation system, authentication, preferences handling, and like/dislike functionality.
+
+##Usage
+   Register: Create a new user account.
+   Login: Access your user account.
+   Generate New Profile: Generate a new profile based on user preferences.
+   Like/Dislike: Like or dislike profiles.
+   Save Preferences: Save user preferences for generating more accurate recommendations.
+   Logout: Logout from the user account.
